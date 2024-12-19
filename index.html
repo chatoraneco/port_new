@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ポートフォリオ</title>
+    <link rel="stylesheet" href="./css/custom.css"> <!-- 外部CSS -->
+    <!-- Google Fonts で Orbitron フォントを追加 -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <nav>
+                <ul>
+                    <li><a href="#about">自己紹介</a></li>
+                    <li><a href="#work">ゲーム</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>H e l l o !</h1>
+            <p>Webデザイナー（見習い）・開発者（見習い） | ドジです</p>
+            <a href="#work" class="cta-button">サイコロゲーム</a>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <h2>三村です。</h2>
+        <p>気ままに色々触ってます。</p>
+    </section>
+
+    <section id="work" class="work">
+    <style>
+        /* サイコロの数字を右側に表示 */
+        .dice-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .dice {
+            font-size: 50px;
+            margin-right: 10px;
+        }
+
+        .dice-number {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .game-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .result-section {
+            margin-top: 20px;
+        }
+
+        .game-container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- サイコロゲーム -->
+    <section id="game" class="work">
+        <div class="game-container">
+            <h3>🎲 サイコロゲーム 🎲</h3>
+            <p>2人でサイコロを振って勝負しよう！</p>
+
+            <!-- プレイヤーAのセクション -->
+            <div class="player-section">
+                <h4>プレイヤーA</h4>
+                <div class="dice-container">
+                    <div id="playerA-dice" class="dice">🎲</div>
+                    <div id="playerA-number" class="dice-number">0</div>
+                </div>
+                <button id="playerA-roll" class="game-button">サイコロを振る</button>
+            </div>
+
+            <!-- プレイヤーBのセクション -->
+            <div class="player-section">
+                <h4>プレイヤーB</h4>
+                <div class="dice-container">
+                    <div id="playerB-dice" class="dice">🎲</div>
+                    <div id="playerB-number" class="dice-number">0</div>
+                </div>
+                <button id="playerB-roll" class="game-button" disabled>サイコロを振る</button>
+            </div>
+
+            <!-- 勝敗表示とスコア -->
+            <div class="result-section">
+                <h4 id="result-message">勝負の結果: ???</h4>
+                <p>スコア: プレイヤーA <span id="playerA-score">0</span> - <span id="playerB-score">0</span> プレイヤーB</p>
+                <button id="reset-game" class="game-button">リセット</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript -->
+    <script>
+        let playerAScore = 0;
+        let playerBScore = 0;
+        let playerAWinCount = 0;
+        let playerBWinCount = 0;
+
+        const playerARollButton = document.getElementById("playerA-roll");
+        const playerBRollButton = document.getElementById("playerB-roll");
+        const playerADice = document.getElementById("playerA-dice");
+        const playerBDice = document.getElementById("playerB-dice");
+        const playerANumber = document.getElementById("playerA-number");
+        const playerBNumber = document.getElementById("playerB-number");
+        const resultMessage = document.getElementById("result-message");
+        const playerAScoreDisplay = document.getElementById("playerA-score");
+        const playerBScoreDisplay = document.getElementById("playerB-score");
+        const resetButton = document.getElementById("reset-game");
+
+        let playerAResult = 0;
+        let playerBResult = 0;
+
+        // プレイヤーAがサイコロを振る
+        playerARollButton.addEventListener("click", function() {
+            if (playerAWinCount >= 3 || playerBWinCount >= 3) {
+                return; // すでにどちらかが3回勝ったらサイコロを振れない
+            }
+            playerAResult = Math.floor(Math.random() * 6) + 1;
+            playerADice.textContent = `🎲`;
+            playerANumber.textContent = playerAResult;
+            playerADice.classList.add("roll-animation");
+
+            // 次はプレイヤーBの番
+            playerARollButton.disabled = true;
+            playerBRollButton.disabled = false;
+
+            setTimeout(() => playerADice.classList.remove("roll-animation"), 500);
+        });
+
+        // プレイヤーBがサイコロを振る
+        playerBRollButton.addEventListener("click", function() {
+            if (playerAWinCount >= 3 || playerBWinCount >= 3) {
+                return; // すでにどちらかが3回勝ったらサイコロを振れない
+            }
+            playerBResult = Math.floor(Math.random() * 6) + 1;
+            playerBDice.textContent = `🎲`;
+            playerBNumber.textContent = playerBResult;
+            playerBDice.classList.add("roll-animation");
+
+            // 勝敗を判定
+            setTimeout(() => {
+                determineWinner();
+                playerBRollButton.disabled = true;
+            }, 500);
+        });
+
+        // 勝敗を判定する関数
+        function determineWinner() {
+            if (playerAResult > playerBResult) {
+                resultMessage.textContent = "勝負の結果: プレイヤーAの勝ち！🎉";
+                playerAWinCount++;
+            } else if (playerBResult > playerAResult) {
+                resultMessage.textContent = "勝負の結果: プレイヤーBの勝ち！🎉";
+                playerBWinCount++;
+            } else {
+                resultMessage.textContent = "引き分け！もう一度振ろう！";
+            }
+            updateScores();
+            checkGameOver();
+            resetRound();
+        }
+
+        // スコアを更新する関数
+        function updateScores() {
+            playerAScoreDisplay.textContent = playerAWinCount;
+            playerBScoreDisplay.textContent = playerBWinCount;
+        }
+
+        // ゲーム終了の判定
+        function checkGameOver() {
+            if (playerAWinCount >= 3) {
+                resultMessage.textContent = "ゲーム終了！プレイヤーAの勝ちです！🎉";
+                playerARollButton.disabled = true;
+                playerBRollButton.disabled = true;
+            } else if (playerBWinCount >= 3) {
+                resultMessage.textContent = "ゲーム終了！プレイヤーBの勝ちです！🎉";
+                playerARollButton.disabled = true;
+                playerBRollButton.disabled = true;
+            }
+        }
+
+        // 次のラウンドをリセットする関数
+        function resetRound() {
+            playerARollButton.disabled = false;
+            playerBRollButton.disabled = true;
+            playerADice.textContent = "🎲";
+            playerBDice.textContent = "🎲";
+            playerANumber.textContent = "0";
+            playerBNumber.textContent = "0";
+        }
+
+        // ゲーム全体をリセットする
+        resetButton.addEventListener("click", function() {
+            playerAWinCount = 0;
+            playerBWinCount = 0;
+            resultMessage.textContent = "勝負の結果: ???";
+            updateScores();
+            resetRound();
+            playerARollButton.disabled = false;
+            playerBRollButton.disabled = true;
+        });
+    </script>
+
+</body>
+</html>
